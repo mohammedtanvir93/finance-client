@@ -7,6 +7,7 @@ import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, X } from 'lucide-react';
+import { useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -19,7 +20,6 @@ export interface IUser {
 }
 
 interface IProps {
-    create?: boolean;
     user?: IUser | null;
     onCloseModal: () => void;
 }
@@ -45,7 +45,9 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-const UserForm = ({ create = true, user, onCloseModal }: IProps) => {
+const UserForm = ({ user, onCloseModal }: IProps) => {
+    const create = useMemo(() => user === null, [user]);
+
     const {
         register,
         handleSubmit,
@@ -72,7 +74,7 @@ const UserForm = ({ create = true, user, onCloseModal }: IProps) => {
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
                 <div className="px-2 pr-14">
                     <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                        {create ? 'Create New User' : 'Update New User'}
+                        {create ? 'Create New User' : 'Update User'}
                     </h4>
                 </div>
                 <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
