@@ -1,13 +1,14 @@
 'use client';
 
+import ErrorMsg from "@/components/form/error-msg";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
-import { Save, X } from 'lucide-react';
-import { z } from "zod";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save, X } from 'lucide-react';
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 
 interface IUser {
     id: string;
@@ -24,9 +25,22 @@ interface IProps {
 }
 
 const schema = z.object({
-    email: z.string().email().min(3).max(100),
-    name: z.string().min(3).max(255),
-    role: z.string().min(3).max(100)
+    email: z
+        .string()
+        .min(1, { message: "Email is required" })
+        .min(3, { message: "Email must be at least 3 characters" })
+        .max(100, { message: "Email must be under 100 characters" })
+        .email("Please enter a valid email address"),
+    name: z
+        .string()
+        .min(1, { message: "Name is required" })
+        .min(3, { message: "Name must be at least 3 characters" })
+        .max(255, { message: "Name must be under 255 characters" }),
+    role: z
+        .string()
+        .min(1, { message: "Role is required" })
+        .min(3, { message: "Role must be at least 3 characters" })
+        .max(100, { message: "Role must be under 100 characters" }),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -58,9 +72,7 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
                                     error={errors.email !== undefined}
                                     {...register('email')}
                                 />
-                                {errors.email?.message && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-                                )}
+                                <ErrorMsg message={errors.email?.message} />
                             </div>
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Name</Label>
@@ -70,9 +82,7 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
                                     error={errors.name !== undefined}
                                     {...register('name')}
                                 />
-                                {errors.name?.message && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
-                                )}
+                                <ErrorMsg message={errors.name?.message} />
                             </div>
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Role</Label>
@@ -82,9 +92,7 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
                                     error={errors.role !== undefined}
                                     {...register('role')}
                                 />
-                                {errors.role?.message && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
-                                )}
+                                <ErrorMsg message={errors.role?.message} />
                             </div>
                         </div>
                     </div>
