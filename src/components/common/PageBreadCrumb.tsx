@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { MoveRight } from 'lucide-react';
 
 interface PageLink {
   title: string;
@@ -29,7 +29,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, pageLinks }) => 
               href="/"
             >
               Home
-              <ArrowRightIcon className="text-gray-500" width={20} height={20}/>
+              <MoveRight className="text-gray-500" width={14}/>
             </Link>
           </li>
           {
@@ -40,7 +40,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, pageLinks }) => 
                   href={ pageLink.url }
                 >
                   { pageLink.title }
-                  <ArrowRightIcon className="text-gray-500" width={18} height={20}/>
+                  <MoveRight className="text-gray-500" width={14}/>
                 </Link>
               </li>
             ))
