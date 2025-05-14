@@ -12,13 +12,18 @@ import {
 } from "@/components/ui/table";
 import { Plus } from 'lucide-react';
 import { useState } from "react";
+import UserForm from "./user-form";
 
 const UserTable = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [searchKey, setSearchKey] = useState('');
+    const [openUserForm, setOpenUserForm] = useState(false);
 
     return (
         <>
+            {
+                openUserForm && <UserForm onCloseModal={() => setOpenUserForm(false)} />
+            }
             <div className="flex items-center justify-between mb-5">
                 <SearchInput
                     className="w-[500px]"
@@ -26,7 +31,12 @@ const UserTable = () => {
                     onSearchKeyChange={(searchKey) => setSearchKey(searchKey)}
                 />
 
-                <Button className="bg-green-600 hover:bg-green-700" size="sm" variant="primary" startIcon={<Plus />}>
+                <Button
+                    onClick={() => setOpenUserForm(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                    size="sm"
+                    variant="primary"
+                    startIcon={<Plus />}>
                     Add User
                 </Button>
             </div>
