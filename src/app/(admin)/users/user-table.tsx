@@ -58,6 +58,11 @@ const UserTable = () => {
         setRemovableUser(null);
     };
 
+    const handleCloseForm = () => {
+        setUser(null);
+        setOpenUserForm(false);
+    };
+
     return (
         <>
             {
@@ -80,7 +85,7 @@ const UserTable = () => {
                 />
             }
             {
-                openUserForm && <UserForm user={user} onCloseModal={() => setOpenUserForm(false)} />
+                openUserForm && <UserForm user={user} onCloseModal={handleCloseForm} />
             }
             <div className="flex items-center justify-between mb-5">
                 <SearchInput
