@@ -1,10 +1,10 @@
-
 import { Metadata } from 'next';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import UserTable from './user-table';
+import { useState } from 'react';
 
 export const metadata: Metadata = {
-    title: "User Information",
+    title: "User List",
     description: "Browse through a list of users with detailed information in a clean, easy-to-read table format.",
 };
 

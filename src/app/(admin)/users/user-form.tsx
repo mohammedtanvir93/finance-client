@@ -10,7 +10,7 @@ import { Save, X } from 'lucide-react';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface IUser {
+export interface IUser {
     id: string;
     name: string;
     email: string;
@@ -20,7 +20,7 @@ interface IUser {
 
 interface IProps {
     create?: boolean;
-    user?: IUser;
+    user?: IUser | null;
     onCloseModal: () => void;
 }
 
@@ -45,7 +45,7 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-const UserForm = ({ create = true, onCloseModal }: IProps) => {
+const UserForm = ({ create = true, user, onCloseModal }: IProps) => {
     const {
         register,
         handleSubmit,
@@ -54,7 +54,12 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
             errors
         }
     } = useForm<FormFields>({
-        resolver: zodResolver(schema)
+        resolver: zodResolver(schema),
+        defaultValues: user ? {
+            email: user.email,
+            name: user.name,
+            role: user.role
+        } : undefined
     });
 
     const onSubmit: SubmitHandler<FormFields> = (data) => {
