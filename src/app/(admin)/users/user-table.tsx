@@ -1,5 +1,6 @@
 'use client';
 
+import Button from "@/components/ui/button/Button";
 import Pagination from "@/components/ui/pagination";
 import SearchInput from "@/components/ui/search";
 import {
@@ -20,15 +21,14 @@ const UserTable = () => {
         <>
             <div className="flex items-center justify-between mb-5">
                 <SearchInput
-                    className="w-[400px]"
+                    className="w-[500px]"
                     label="Search Users"
                     onSearchKeyChange={(searchKey) => setSearchKey(searchKey)}
                 />
-                <button className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-4 rounded">
-                    <Plus className="w-3 h-3" />
-                    Add
-                </button>
 
+                <Button className="bg-green-600 hover:bg-green-700" size="sm" variant="primary" startIcon={<Plus />}>
+                    Add User
+                </Button>
             </div>
 
             <Table>

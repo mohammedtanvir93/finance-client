@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const SearchInput = ({
-    className = 'relative w-full mb-4',
+    className,
     label,
     onSearchKeyChange
 }: IProps) => {
@@ -23,7 +23,7 @@ const SearchInput = ({
     };
 
     return (
-        <div className={className}>
+        <div className={`relative mb-4 ${className}`}>
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 w-5 h-5" />
             <input
                 onChange={
