@@ -5,6 +5,9 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
 import { Save, X } from 'lucide-react';
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface IUser {
     id: string;
@@ -20,10 +23,19 @@ interface IProps {
     onCloseModal: () => void;
 }
 
-const UserForm = ({ create = true, onCloseModal }: IProps) => {
+const schema = z.object({
+    email: z.string().email().min(3).max(100),
+    name: z.string().min(3).max(255),
+    role: z.string().min(3).max(100)
+});
 
-    const handleSave = () => {
-        console.log("Saving changes...");
+type FormFields = z.infer<typeof schema>;
+
+const UserForm = ({ create = true, onCloseModal }: IProps) => {
+    const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<FormFields>({ resolver: zodResolver(schema) });
+
+    const onSubmit: SubmitHandler<FormFields> = (data) => {
+        console.log("Saving changes...", data);
         onCloseModal();
     };
 
@@ -35,20 +47,44 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
                         {create ? 'Create New User' : 'Update New User'}
                     </h4>
                 </div>
-                <form className="flex flex-col">
+                <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
                     <div className="mt-7">
                         <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <div className="col-span-2">
                                 <Label>Email</Label>
-                                <Input type="text" placeholder="Email" />
+                                <Input
+                                    type="text"
+                                    placeholder="Email"
+                                    error={errors.email !== undefined}
+                                    {...register('email')}
+                                />
+                                {errors.email?.message && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                                )}
                             </div>
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Name</Label>
-                                <Input type="text" placeholder="Name" />
+                                <Input
+                                    type="text"
+                                    placeholder="Name"
+                                    error={errors.name !== undefined}
+                                    {...register('name')}
+                                />
+                                {errors.name?.message && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                                )}
                             </div>
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Role</Label>
-                                <Input type="text" placeholder="Role" />
+                                <Input
+                                    type="text"
+                                    placeholder="Role"
+                                    error={errors.role !== undefined}
+                                    {...register('role')}
+                                />
+                                {errors.role?.message && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -56,7 +92,7 @@ const UserForm = ({ create = true, onCloseModal }: IProps) => {
                         <Button size="sm" variant="outline" onClick={onCloseModal} startIcon={<X />}>
                             Close
                         </Button>
-                        <Button size="sm" onClick={handleSave} startIcon={<Save />}>
+                        <Button type="submit" disabled={isSubmitting} size="sm" startIcon={<Save />}>
                             {create ? 'Create' : 'Update'}
                         </Button>
                     </div>

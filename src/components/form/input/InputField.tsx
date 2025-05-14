@@ -1,20 +1,22 @@
 import React, { FC } from "react";
 
 interface InputProps {
-  type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
-  id?: string;
-  name?: string;
-  placeholder?: string;
-  defaultValue?: string | number;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
-  min?: string;
-  max?: string;
-  step?: number;
+  defaultValue?: string | number;
   disabled?: boolean;
-  success?: boolean;
   error?: boolean;
   hint?: string; // Optional hint text
+  id?: string;
+  max?: string | number;
+  min?: string | number;
+  name?: string;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  ref?: React.Ref<HTMLInputElement>;
+  step?: number;
+  success?: boolean;
+  type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
 }
 
 const Input: FC<InputProps> = ({
@@ -32,6 +34,7 @@ const Input: FC<InputProps> = ({
   success = false,
   error = false,
   hint,
+  ...props
 }) => {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
@@ -61,18 +64,18 @@ const Input: FC<InputProps> = ({
         step={step}
         disabled={disabled}
         className={inputClasses}
+        {...props}
       />
 
       {/* Optional Hint Text */}
       {hint && (
         <p
-          className={`mt-1.5 text-xs ${
-            error
-              ? "text-error-500"
-              : success
+          className={`mt-1.5 text-xs ${error
+            ? "text-error-500"
+            : success
               ? "text-success-500"
               : "text-gray-500"
-          }`}
+            }`}
         >
           {hint}
         </p>
