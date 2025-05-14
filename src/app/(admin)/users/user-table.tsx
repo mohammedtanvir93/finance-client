@@ -14,6 +14,7 @@ import { Eye, Pencil, Plus, Trash } from 'lucide-react';
 import { useState } from "react";
 import UserForm, { IUser } from "./user-form";
 import UserDetails, { IUserDetails } from "./user-details";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 const userList: IUserDetails[] = [
     {
@@ -44,6 +45,7 @@ const UserTable = () => {
     const [searchKey, setSearchKey] = useState('');
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
     const [user, setUser] = useState<IUser | null>(null);
+    const [removableUser, setRemovableUser] = useState<IUserDetails | null>(null);
 
     const handleEdit = (editableUser: IUser) => {
         setUserDetails(null);
@@ -51,8 +53,23 @@ const UserTable = () => {
         setUser(editableUser);
     };
 
+    const handleRemove = (removingUser: IUserDetails) => {
+        console.log(`Deleted: ${removingUser.name}`);
+        setRemovableUser(null);
+    };
+
     return (
         <>
+            {
+                removableUser &&
+                <ConfirmDialog
+                    message={`Are you sure you want to delete user - ${removableUser.name} with email ${removableUser.email} ?`}
+                    confirmBtnTitle="Delete"
+                    confirmBtnIcon={<Trash />}
+                    onCloseConfirmDialog={() => setRemovableUser(null)}
+                    onConfirm={() => handleRemove(removableUser)}
+                />
+            }
             {
                 userDetails
                 &&
@@ -173,7 +190,7 @@ const UserTable = () => {
                                                             Details
                                                         </a>
                                                     </li>
-                                                    <li>
+                                                    <li onClick={() => setRemovableUser(user)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                             <Trash className="w-4 h-4" />
                                                             Remove
