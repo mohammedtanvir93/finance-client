@@ -1,5 +1,7 @@
 'use client';
 
+import Pagination from "@/components/ui/pagination";
+import SearchInput from "@/components/ui/search";
 import {
     Table,
     TableBody,
@@ -7,9 +9,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Plus } from 'lucide-react';
 import { useState } from "react";
-import SearchInput from "@/components/ui/search";
-import Pagination from "@/components/ui/pagination";
 
 const UserTable = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -17,10 +18,19 @@ const UserTable = () => {
 
     return (
         <>
-            <SearchInput
-                label='Search Users'
-                onSearchKeyChange={(searchKey) => setSearchKey(searchKey)}
-            />
+            <div className="flex items-center justify-between mb-5">
+                <SearchInput
+                    className="w-[400px]"
+                    label="Search Users"
+                    onSearchKeyChange={(searchKey) => setSearchKey(searchKey)}
+                />
+                <button className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-4 rounded">
+                    <Plus className="w-3 h-3" />
+                    Add
+                </button>
+
+            </div>
+
             <Table>
                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                     <TableRow>
