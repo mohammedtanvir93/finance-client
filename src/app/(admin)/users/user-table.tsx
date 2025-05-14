@@ -1,6 +1,7 @@
 'use client';
 
 import Button from "@/components/ui/button/Button";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Pagination from "@/components/ui/pagination";
 import SearchInput from "@/components/ui/search";
 import {
@@ -12,29 +13,28 @@ import {
 } from "@/components/ui/table";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
 import { useState } from "react";
-import UserForm, { IUser } from "./user-form";
 import UserDetails, { IUserDetails } from "./user-details";
-import ConfirmDialog from "@/components/ui/confirm-dialog";
+import UserForm, { IUser } from "./user-form";
 
 const userList: IUserDetails[] = [
     {
+        createdAt: new Date(),
+        email: 'mohammed.tanvir447@gmail.com',
         id: 'ce27d86a-ab0c-4e9e-8fbc-79c6faba0e51',
-        email: 'abc@gmail.com',
-        name: 'ABC',
+        joinedAt: null,
+        name: 'Mohammed Nazmul Huda Tanvir',
         role: 'ADMIN',
         status: 'ACTIVE',
-        joinedAt: null,
-        createdAt: new Date(),
         updatedAt: new Date(),
     },
     {
-        id: '649c5316-72f3-4b61-9bad-25d25ec0d1b5',
+        createdAt: new Date(),
         email: 'def@gmail.com',
+        id: '649c5316-72f3-4b61-9bad-25d25ec0d1b5',
+        joinedAt: new Date(),
         name: 'DEF',
         role: 'EDITOR',
         status: 'PENDING',
-        joinedAt: new Date(),
-        createdAt: new Date(),
         updatedAt: new Date(),
     }
 ];
@@ -177,7 +177,7 @@ const UserTable = () => {
                                         </button>
 
                                         {actionRow === user.id && (
-                                            <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+                                            <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-26 dark:bg-gray-700">
                                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                                                     <li onClick={() => handleEdit(user)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">

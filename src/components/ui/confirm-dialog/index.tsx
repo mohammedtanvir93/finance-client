@@ -1,22 +1,22 @@
 import Button from "@/components/ui/button/Button";
+import { Modal } from "@/components/ui/modal";
 import { X } from "lucide-react";
 import { ReactNode } from "react";
-import { Modal } from "@/components/ui/modal";
 
 interface IProps {
-    message: string;
-    confirmBtnTitle: string;
     confirmBtnIcon: ReactNode;
+    confirmBtnTitle: string;
+    message: string;
     onCloseConfirmDialog: () => void;
     onConfirm: () => void;
 }
 
 const ConfirmDialog = ({
-    onConfirm,
-    message,
+    confirmBtnIcon,
     confirmBtnTitle,
+    message,
     onCloseConfirmDialog,
-    confirmBtnIcon
+    onConfirm
 }: IProps) => {
     return (
         <Modal isOpen={true} onClose={onCloseConfirmDialog} className="max-w-[700px] m-4">

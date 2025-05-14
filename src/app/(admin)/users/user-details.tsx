@@ -3,13 +3,13 @@ import { Modal } from "@/components/ui/modal";
 import { IUser } from "./user-form";
 
 export interface IUserDetails {
-    id: string;
+    createdAt: Date;
     email: string;
+    id: string;
+    joinedAt: Date | null;
     name: string;
     role: string;
     status: string;
-    joinedAt: Date | null;
-    createdAt: Date;
     updatedAt: Date;
 }
 
@@ -19,7 +19,11 @@ interface IProps {
     onEdit: (editableUser: IUser) => void;
 }
 
-const UserDetails = ({ user, onEdit, onCloseModal }: IProps) => {
+const UserDetails = ({
+    onCloseModal,
+    onEdit,
+    user
+}: IProps) => {
     return (
         <Modal isOpen={true} onClose={onCloseModal} className="max-w-[700px] m-4">
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">

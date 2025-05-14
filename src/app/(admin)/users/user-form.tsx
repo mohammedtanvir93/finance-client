@@ -12,9 +12,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 export interface IUser {
+    email: string;
     id: string;
     name: string;
-    email: string;
     role: string;
     status: string;
 }
@@ -45,7 +45,10 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-const UserForm = ({ user, onCloseModal }: IProps) => {
+const UserForm = ({
+    onCloseModal,
+    user
+}: IProps) => {
     const create = useMemo(() => user === null, [user]);
 
     const {
