@@ -46,7 +46,16 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 const UserForm = ({ create = true, onCloseModal }: IProps) => {
-    const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<FormFields>({ resolver: zodResolver(schema) });
+    const {
+        register,
+        handleSubmit,
+        formState: {
+            isSubmitting,
+            errors
+        }
+    } = useForm<FormFields>({
+        resolver: zodResolver(schema)
+    });
 
     const onSubmit: SubmitHandler<FormFields> = (data) => {
         console.log("Saving changes...", data);
