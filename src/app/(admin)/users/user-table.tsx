@@ -1,5 +1,7 @@
 'use client';
 
+import SortIcon from "@/components/tables/SortIcon";
+import Badge, { BadgeColor } from "@/components/ui/badge/Badge";
 import Button from "@/components/ui/button/Button";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Pagination from "@/components/ui/pagination";
@@ -11,41 +13,68 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useUsers } from '@/hooks/query/useUsers';
+import usePagination from "@/hooks/usePagination";
+import { IUser } from "@/types/user";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from 'react-toastify';
 import UserDetails, { IUserDetails } from "./user-details";
-import UserForm, { IUser } from "./user-form";
 
-const userList: IUserDetails[] = [
-    {
-        createdAt: new Date(),
-        email: 'mohammed.tanvir447@gmail.com',
-        id: 'ce27d86a-ab0c-4e9e-8fbc-79c6faba0e51',
-        joinedAt: null,
-        name: 'Mohammed Nazmul Huda Tanvir',
-        role: 'ADMIN',
-        status: 'ACTIVE',
-        updatedAt: new Date(),
-    },
-    {
-        createdAt: new Date(),
-        email: 'def@gmail.com',
-        id: '649c5316-72f3-4b61-9bad-25d25ec0d1b5',
-        joinedAt: new Date(),
-        name: 'DEF',
-        role: 'EDITOR',
-        status: 'PENDING',
-        updatedAt: new Date(),
-    }
-];
+type UserStatus = IUser['status'];
+
+const STATUS_BADGES: Record<UserStatus, BadgeColor> = {
+    'ACTIVE': 'success',
+    'PENDING': 'info',
+    'INACTIVE': 'warning'
+};
 
 const UserTable = () => {
+    const toastId = useRef<string | number | null>(null);
+
     const [actionRow, setActionRow] = useState('');
     const [openUserForm, setOpenUserForm] = useState(false);
-    const [searchKey, setSearchKey] = useState('');
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
     const [user, setUser] = useState<IUser | null>(null);
     const [removableUser, setRemovableUser] = useState<IUserDetails | null>(null);
+    const {
+        searchKey, setSearchKey,
+        page, setPage,
+        itemsPerPage, setItemsPerPage,
+        sortBy, setSortBy,
+        sortOrder, setSortOrder, toggleSortOrder
+    } = usePagination('created_at', 'asc');
+
+    const { data: paginatedResponse, isLoading, error } = useUsers({
+        skip: (page - 1) * itemsPerPage,
+        limit: itemsPerPage,
+        filter: {
+            search: searchKey,
+            sort: {
+                sortBy: sortBy,
+                sortOrder: sortOrder,
+            },
+        },
+    });
+
+    useEffect(() => {
+        if (isLoading && toastId.current === null) {
+            toastId.current = toast.loading('Loading users...');
+        }
+
+        if (!isLoading && toastId.current) {
+            toast.dismiss(toastId.current);
+            toastId.current = null;
+
+            if (error) {
+                toast.error('Failed to load users');
+            }
+        }
+    }, [isLoading, error]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [searchKey]);
 
     const handleEdit = (editableUser: IUser) => {
         setUserDetails(null);
@@ -63,6 +92,19 @@ const UserTable = () => {
         setOpenUserForm(false);
     };
 
+    const getStatusBadge = (status: UserStatus) => {
+        return (
+            <Badge variant="light" color={STATUS_BADGES[status]}>
+                {status}
+            </Badge>
+        );
+    };
+
+    const handlePageOrPageItemChange = (page, itemsPerPage) => {
+        setPage(page);
+        setItemsPerPage(itemsPerPage);
+    };
+
     return (
         <>
             {
@@ -75,7 +117,7 @@ const UserTable = () => {
                     onConfirm={() => handleRemove(removableUser)}
                 />
             }
-            {
+            {/* {
                 userDetails
                 &&
                 <UserDetails
@@ -86,7 +128,7 @@ const UserTable = () => {
             }
             {
                 openUserForm && <UserForm user={user} onCloseModal={handleCloseForm} />
-            }
+            } */}
             <div className="flex items-center justify-between mb-5">
                 <SearchInput
                     className="w-[500px]"
@@ -108,28 +150,64 @@ const UserTable = () => {
                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                     <TableRow>
                         <TableCell
+                            onClick={() => setSortBy('fullname')}
                             isHeader
-                            className="px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
+                            className="cursor-pointer px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
                         >
-                            Name
+                            <div className="flex items-center justify-between w-full">
+                                <span>Name</span>
+                                <SortIcon
+                                    onDirChange={toggleSortOrder}
+                                    matchingField="fullname"
+                                    sortedColumn={sortBy}
+                                    sortDir={sortOrder}
+                                />
+                            </div>
                         </TableCell>
                         <TableCell
+                            onClick={() => setSortBy('email')}
                             isHeader
-                            className="px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
+                            className="cursor-pointer px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
                         >
-                            Email
+                            <div className="flex items-center justify-between w-full">
+                                <span>Email</span>
+                                <SortIcon
+                                    onDirChange={toggleSortOrder}
+                                    matchingField="email"
+                                    sortedColumn={sortBy}
+                                    sortDir={sortOrder}
+                                />
+                            </div>
                         </TableCell>
                         <TableCell
+                            onClick={() => setSortBy('role')}
                             isHeader
-                            className="px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
+                            className="cursor-pointer px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
                         >
-                            Role
+                            <div className="flex items-center justify-between w-full">
+                                <span>Role</span>
+                                <SortIcon
+                                    onDirChange={toggleSortOrder}
+                                    matchingField="role"
+                                    sortedColumn={sortBy}
+                                    sortDir={sortOrder}
+                                />
+                            </div>
                         </TableCell>
                         <TableCell
+                            onClick={() => setSortBy('status')}
                             isHeader
-                            className="px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
+                            className="cursor-pointer px-2 py-3 font-medium text-gray-700 text-start text-theme-xs dark:text-gray-200"
                         >
-                            Status
+                            <div className="flex items-center justify-between w-full">
+                                <span>Status</span>
+                                <SortIcon
+                                    onDirChange={toggleSortOrder}
+                                    matchingField="status"
+                                    sortedColumn={sortBy}
+                                    sortDir={sortOrder}
+                                />
+                            </div>
                         </TableCell>
                         <TableCell
                             isHeader
@@ -141,11 +219,19 @@ const UserTable = () => {
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                     {
-                        userList.map(user => (
+                        paginatedResponse?.data.length === 0 &&
+                        <TableRow key='no-user-found' className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <TableCell colSpan={5} className="py-4 sm:px-2 text-center text-red-500">
+                                No User Found
+                            </TableCell>
+                        </TableRow>
+                    }
+                    {
+                        paginatedResponse?.data.map(user => (
                             <TableRow key={user.id} className="hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <TableCell className="py-4 sm:px-2 text-start">
                                     <span className="py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        {user.name}
+                                        {user.fullname}
                                     </span>
                                 </TableCell>
                                 <TableCell className="py-4 sm:px-2 text-start">
@@ -155,12 +241,12 @@ const UserTable = () => {
                                 </TableCell>
                                 <TableCell className="py-4 sm:px-2 text-start">
                                     <span className="text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        {user.role}
+                                        {user.role.title}
                                     </span>
                                 </TableCell>
                                 <TableCell className="py-4 sm:px-2 text-start">
                                     <span className="py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        {user.status}
+                                        {getStatusBadge(user.status)}
                                     </span>
                                 </TableCell>
                                 <TableCell className="py-4 sm:px-2 text-start">
@@ -176,7 +262,7 @@ const UserTable = () => {
                                             </svg>
                                         </button>
 
-                                        {actionRow === user.id && (
+                                        {/* {actionRow === user.id && (
                                             <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-26 dark:bg-gray-700">
                                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                                                     <li onClick={() => handleEdit(user)}>
@@ -203,7 +289,7 @@ const UserTable = () => {
                                                     </li>
                                                 </ul>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -211,7 +297,7 @@ const UserTable = () => {
                     }
                 </TableBody>
             </Table>
-            <Pagination totalItems={1} onPageOrPageItemChange={(page, itemsPerPage) => console.log(page, itemsPerPage)} />
+            <Pagination page={page} totalItems={paginatedResponse?.total || 0} onPageOrPageItemChange={(page, itemsPerPage) => handlePageOrPageItemChange(page, itemsPerPage)} />
         </>
     )
 }

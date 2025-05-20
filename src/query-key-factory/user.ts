@@ -1,4 +1,4 @@
-import IPaginatedList from "@/interfaces/paginatedList";
+import IPaginatedList from "@/types/paginatedList";
 
 const userKeys = {
     all: ['users'] as const,
