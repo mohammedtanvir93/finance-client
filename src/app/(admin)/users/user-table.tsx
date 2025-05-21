@@ -21,6 +21,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import UserDetails from "./user-details";
 import UserForm from "./user-form";
+import { useDeleteUser } from "@/hooks/mutation/user/useDeleteUser";
 
 const UserTable = () => {
     const toastId = useRef<string | number | null>(null);
@@ -29,7 +30,7 @@ const UserTable = () => {
     const [openUserForm, setOpenUserForm] = useState(false);
     const [userDetailsId, setUserDetailsId] = useState<string>('');
     const [userId, setUserId] = useState<string>('');
-    const [removableUser, setRemovableUser] = useState<IUserDetails | null>(null);
+    const [removableUserId, setRemovableUserId] = useState<string>('');
     const {
         searchKey, setSearchKey,
         page, setPage,
@@ -62,6 +63,31 @@ const UserTable = () => {
         isLoading: isUserLoading,
         error: userError
     } = useUser(userId);
+
+    const {
+        data: removableUser,
+        isLoading: isRemovableUserLoading,
+        error: removableUserError
+    } = useUser(removableUserId);
+
+    const {
+        mutate: deleteUser
+    } = useDeleteUser(paginatedListParams);
+
+    useEffect(() => {
+        if (isRemovableUserLoading && toastId.current === null) {
+            toastId.current = toast.loading('Loading user...');
+        }
+
+        if (!isRemovableUserLoading && toastId.current) {
+            toast.dismiss(toastId.current);
+            toastId.current = null;
+
+            if (removableUserError) {
+                toast.error('Failed to load user');
+            }
+        }
+    }, [isRemovableUserLoading, removableUserError]);
 
     useEffect(() => {
         if (isLoading && toastId.current === null) {
@@ -118,9 +144,26 @@ const UserTable = () => {
         setUserId(editableUserId);
     };
 
-    const handleRemove = (removingUser: IUserDetails) => {
-        console.log(`Deleted: ${removingUser.name}`);
-        setRemovableUser(null);
+    const handleRemove = (removingUserId: string) => {
+        setRemovableUserId('');
+
+        toastId.current = toast.loading('Deleting user...');
+
+        deleteUser(removingUserId, {
+            onSuccess: () => {
+                toast.success('User deleted successfully');
+            },
+            onError: (error) => {
+                console.error(error);
+                toast.error('Failed to delete user');
+            },
+            onSettled: () => {
+                if (toastId.current) {
+                    toast.dismiss(toastId.current);
+                    toastId.current = null;
+                }
+            }
+        });
     };
 
     const handleCloseForm = () => {
@@ -138,11 +181,22 @@ const UserTable = () => {
             {
                 removableUser &&
                 <ConfirmDialog
-                    message={`Are you sure you want to delete user - ${removableUser.name} with email ${removableUser.email} ?`}
+                    message={
+                        <article>
+                            Are you sure you want to delete user&nbsp;
+                            <span className="text-xs font-semibold text-gray-800 dark:text-white/90">
+                                {removableUser.fullname}
+                            </span>&nbsp;with email&nbsp;
+                            <span className="text-xs font-semibold text-gray-800 dark:text-white/90">
+                                {removableUser.email}
+                            </span>?
+                        </article>
+
+                    }
                     confirmBtnTitle="Delete"
                     confirmBtnIcon={<Trash />}
-                    onCloseConfirmDialog={() => setRemovableUser(null)}
-                    onConfirm={() => handleRemove(removableUser)}
+                    onCloseConfirmDialog={() => setRemovableUserId('')}
+                    onConfirm={() => handleRemove(removableUserId)}
                 />
             }
             {
@@ -309,12 +363,12 @@ const UserTable = () => {
                                                             Details
                                                         </a>
                                                     </li>
-                                                    {/* <li onClick={() => setRemovableUser(user)}>
+                                                    <li onClick={() => setRemovableUserId(user.id)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                             <Trash className="w-4 h-4" />
                                                             Remove
                                                         </a>
-                                                    </li> */}
+                                                    </li>
                                                 </ul>
                                             </div>
                                         )}

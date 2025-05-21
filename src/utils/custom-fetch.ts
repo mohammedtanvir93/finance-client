@@ -32,7 +32,18 @@ async function customFetch<T = any>(
             throw new Error(`${JSON.stringify(errorDetails)}`);
         }
 
-        return response.json() as Promise<T>;
+        const contentLength = response.headers.get('content-length');
+        const contentType = response.headers.get('content-type');
+
+        if (
+            response.status !== 204 &&
+            contentLength !== '0' &&
+            contentType?.includes('application/json')
+        ) {
+            return response.json() as Promise<T>;
+        }
+
+        return undefined as unknown as T;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         if (err.name === 'AbortError') {

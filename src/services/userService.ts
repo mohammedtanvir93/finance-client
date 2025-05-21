@@ -31,3 +31,7 @@ export const updateUser = async (id: string, payload: UserUpdate): Promise<UserD
     const response = await http.patch<UserDetails>(`${BASE_URL}/users/${id}`, payload);
     return response;
 };
+
+export const deleteUser = async (id: string): Promise<void> => {
+    await http.delete(`${BASE_URL}/users/${id}`);
+};

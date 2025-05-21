@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 interface Props {
     confirmBtnIcon: ReactNode;
     confirmBtnTitle: string;
-    message: string;
+    message: ReactNode;
     onCloseConfirmDialog: () => void;
     onConfirm: () => void;
 }
@@ -21,7 +21,7 @@ const ConfirmDialog = ({
     return (
         <Modal isOpen={true} onClose={onCloseConfirmDialog} className="max-w-[700px] m-4">
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-                <p className="text-gray-500 text-start text-theme-sm dark:text-gray-400">{message}</p>
+                <div className="text-gray-500 text-start text-theme-sm dark:text-gray-400">{message}</div>
 
                 <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
                     <Button size="sm" variant="outline" onClick={onCloseConfirmDialog} startIcon={<X />}>

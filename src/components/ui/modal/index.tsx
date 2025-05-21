@@ -88,7 +88,7 @@ export const Modal: React.FC<ModalProps> = ({
             </svg>
           </button>
         )}
-        <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3 my-4 mx-[6px]">{children}</div>
+        <div className="custom-scrollbar h-max-[450px] overflow-y-auto px-2 pb-3 my-4 mx-[6px]">{children}</div>
       </div>
     </div>
   );
