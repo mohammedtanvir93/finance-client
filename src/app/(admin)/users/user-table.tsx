@@ -1,7 +1,6 @@
 'use client';
 
 import SortIcon from "@/components/tables/SortIcon";
-import Badge, { BadgeColor } from "@/components/ui/badge/Badge";
 import Button from "@/components/ui/button/Button";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Pagination from "@/components/ui/pagination";
@@ -13,29 +12,25 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { useUsers } from '@/hooks/query/useUsers';
+import { useUsers } from '@/hooks/query/user/useUsers';
 import usePagination from "@/hooks/usePagination";
 import { User } from "@/types/user";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
 import { useEffect, useRef, useState } from "react";
 import { toast } from 'react-toastify';
-import UserDetails, { IUserDetails } from "./user-details";
+import UserDetails from "./user-details";
+import { useUser } from '@/hooks/query/user/useUser';
+import getStatusBadge from "@/utils/user-status-badge";
 
 type UserStatus = User['status'];
-
-const STATUS_BADGES: Record<UserStatus, BadgeColor> = {
-    'ACTIVE': 'success',
-    'PENDING': 'info',
-    'INACTIVE': 'warning'
-};
 
 const UserTable = () => {
     const toastId = useRef<string | number | null>(null);
 
     const [actionRow, setActionRow] = useState('');
     const [openUserForm, setOpenUserForm] = useState(false);
-    const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
-    const [user, setUser] = useState<User | null>(null);
+    const [userDetailsId, setUserDetailsId] = useState<string>('');
+    const [userId, setUserId] = useState<string>('');
     const [removableUser, setRemovableUser] = useState<IUserDetails | null>(null);
     const {
         searchKey, setSearchKey,
@@ -57,6 +52,18 @@ const UserTable = () => {
         },
     });
 
+    const {
+        data: userDetails,
+        isLoading: isUserDetailsLoading,
+        error: userDetailsError
+    } = useUser(userDetailsId);
+
+    const {
+        data: user,
+        isLoading: isUserLoading,
+        error: userError
+    } = useUser(userId);
+
     useEffect(() => {
         if (isLoading && toastId.current === null) {
             toastId.current = toast.loading('Loading users...');
@@ -73,13 +80,28 @@ const UserTable = () => {
     }, [isLoading, error]);
 
     useEffect(() => {
+        if (isUserDetailsLoading && toastId.current === null) {
+            toastId.current = toast.loading('Loading user...');
+        }
+
+        if (!isUserDetailsLoading && toastId.current) {
+            toast.dismiss(toastId.current);
+            toastId.current = null;
+
+            if (userDetailsError) {
+                toast.error('Failed to load user');
+            }
+        }
+    }, [isUserDetailsLoading, userDetailsError]);
+
+    useEffect(() => {
         setPage(1);
     }, [searchKey]);
 
-    const handleEdit = (editableUser: User) => {
-        setUserDetails(null);
+    const handleEdit = (editableUserId: string) => {
+        setUserDetailsId('');
         setOpenUserForm(true);
-        setUser(editableUser);
+        setUserId(editableUserId);
     };
 
     const handleRemove = (removingUser: IUserDetails) => {
@@ -87,20 +109,12 @@ const UserTable = () => {
         setRemovableUser(null);
     };
 
-    const handleCloseForm = () => {
-        setUser(null);
-        setOpenUserForm(false);
-    };
+    // const handleCloseForm = () => {
+    //     setUser(null);
+    //     setOpenUserForm(false);
+    // };
 
-    const getStatusBadge = (status: UserStatus) => {
-        return (
-            <Badge variant="light" color={STATUS_BADGES[status]}>
-                {status}
-            </Badge>
-        );
-    };
-
-    const handlePageOrPageItemChange = (page, itemsPerPage) => {
+    const handlePageOrPageItemChange = (page: number, itemsPerPage: number) => {
         setPage(page);
         setItemsPerPage(itemsPerPage);
     };
@@ -117,16 +131,16 @@ const UserTable = () => {
                     onConfirm={() => handleRemove(removableUser)}
                 />
             }
-            {/* {
+            {
                 userDetails
                 &&
                 <UserDetails
-                    onEdit={(editableUser: IUser) => handleEdit(editableUser)}
+                    onEdit={(editableUserId: string) => handleEdit(editableUserId)}
                     user={userDetails}
-                    onCloseModal={() => setUserDetails(null)}
+                    onCloseModal={() => setUserDetailsId('')}
                 />
             }
-            {
+            {/* {
                 openUserForm && <UserForm user={user} onCloseModal={handleCloseForm} />
             } */}
             <div className="flex items-center justify-between mb-5">
@@ -262,18 +276,18 @@ const UserTable = () => {
                                             </svg>
                                         </button>
 
-                                        {/* {actionRow === user.id && (
+                                        {actionRow === user.id && (
                                             <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-26 dark:bg-gray-700">
                                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                                    <li onClick={() => handleEdit(user)}>
+                                                    {/* <li onClick={() => handleEdit(user)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                             <Pencil className="w-4 h-4" />
                                                             Edit
                                                         </a>
-                                                    </li>
+                                                    </li> */}
                                                     <li>
                                                         <a
-                                                            onClick={() => setUserDetails(user)}
+                                                            onClick={() => setUserDetailsId(user.id)}
                                                             href="#"
                                                             className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                                         >
@@ -281,15 +295,15 @@ const UserTable = () => {
                                                             Details
                                                         </a>
                                                     </li>
-                                                    <li onClick={() => setRemovableUser(user)}>
+                                                    {/* <li onClick={() => setRemovableUser(user)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                             <Trash className="w-4 h-4" />
                                                             Remove
                                                         </a>
-                                                    </li>
+                                                    </li> */}
                                                 </ul>
                                             </div>
-                                        )} */}
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

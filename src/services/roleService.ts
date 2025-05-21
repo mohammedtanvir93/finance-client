@@ -1,4 +1,4 @@
-import http from '@/utils/customFetch';
+import http from '@/utils/custom-fetch';
 import { RoleBase } from '@/types/role';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_HOST;

@@ -1,22 +1,13 @@
 import Badge from "@/components/ui/badge/Badge";
 import { Modal } from "@/components/ui/modal";
-import { IUser } from "./user-form";
-
-export interface IUserDetails {
-    createdAt: Date;
-    email: string;
-    id: string;
-    joinedAt: Date | null;
-    name: string;
-    role: string;
-    status: string;
-    updatedAt: Date;
-}
+import { User, UserDetails as UserInfo } from "@/types/user";
+import { getFormattedDatetime } from "@/utils/date";
+import getStatusBadge from "@/utils/user-status-badge";
 
 interface Props {
-    user: IUserDetails;
+    user: UserInfo;
     onCloseModal: () => void;
-    onEdit: (editableUser: IUser) => void;
+    onEdit: (editableUserId: string) => void;
 }
 
 const UserDetails = ({
@@ -61,7 +52,7 @@ const UserDetails = ({
                                     Name
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    {user.name}
+                                    {user.fullname}
                                 </p>
                             </div>
 
@@ -79,9 +70,7 @@ const UserDetails = ({
                                     Role
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <Badge variant="solid" color="success">
-                                        {user.role}
-                                    </Badge>
+                                    {user.role.title}
                                 </p>
                             </div>
 
@@ -90,9 +79,7 @@ const UserDetails = ({
                                     Status
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <Badge variant="solid" color="primary">
-                                        {user.status}
-                                    </Badge>
+                                    {getStatusBadge(user.status)}
                                 </p>
                             </div>
 
@@ -101,7 +88,7 @@ const UserDetails = ({
                                     Joined At
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    {user.joinedAt ? user.joinedAt.toLocaleString() : 'Not Yet'}
+                                    {user.joined_at ? getFormattedDatetime(user.joined_at) : 'Not Yet'}
                                 </p>
                             </div>
 
@@ -110,7 +97,7 @@ const UserDetails = ({
                                     Created At
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    {user.createdAt?.toLocaleString()}
+                                    {getFormattedDatetime(user.created_at)}
                                 </p>
                             </div>
 
@@ -119,7 +106,7 @@ const UserDetails = ({
                                     Updated At
                                 </p>
                                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                                    {user.updatedAt?.toLocaleString()}
+                                    {getFormattedDatetime(user.updated_at)}
                                 </p>
                             </div>
                         </div>

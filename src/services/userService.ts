@@ -1,6 +1,6 @@
-import http from '@/utils/customFetch'; // adjust path as needed
+import http from '@/utils/custom-fetch'; // adjust path as needed
 import PaginatedList from '@/types/paginatedList';
-import { PaginatedUserResponse } from '@/types/user';
+import { PaginatedUserResponse, UserDetails } from '@/types/user';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_HOST;
 
@@ -14,5 +14,10 @@ export const fetchUsers = async (params: PaginatedList): Promise<PaginatedUserRe
     };
 
     const response = await http.get<PaginatedUserResponse>(`${BASE_URL}/users`, {}, queryParams);
+    return response;
+};
+
+export const fetchUser = async (id: string): Promise<UserDetails> => {
+    const response = await http.get<UserDetails>(`${BASE_URL}/users/${id}`);
     return response;
 };
