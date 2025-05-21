@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/table";
 import { useUsers } from '@/hooks/query/useUsers';
 import usePagination from "@/hooks/usePagination";
-import { IUser } from "@/types/user";
+import { User } from "@/types/user";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
 import { useEffect, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import UserDetails, { IUserDetails } from "./user-details";
 
-type UserStatus = IUser['status'];
+type UserStatus = User['status'];
 
 const STATUS_BADGES: Record<UserStatus, BadgeColor> = {
     'ACTIVE': 'success',
@@ -35,7 +35,7 @@ const UserTable = () => {
     const [actionRow, setActionRow] = useState('');
     const [openUserForm, setOpenUserForm] = useState(false);
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
-    const [user, setUser] = useState<IUser | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [removableUser, setRemovableUser] = useState<IUserDetails | null>(null);
     const {
         searchKey, setSearchKey,
@@ -76,7 +76,7 @@ const UserTable = () => {
         setPage(1);
     }, [searchKey]);
 
-    const handleEdit = (editableUser: IUser) => {
+    const handleEdit = (editableUser: User) => {
         setUserDetails(null);
         setOpenUserForm(true);
         setUser(editableUser);

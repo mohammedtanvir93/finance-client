@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import { ChangeEvent, useRef } from 'react';
 
-interface IProps {
+interface Props {
     className?: string;
     label: string;
     onSearchKeyChange: (searchKey: string) => void;
@@ -11,7 +11,7 @@ const SearchInput = ({
     className,
     label,
     onSearchKeyChange
-}: IProps) => {
+}: Props) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const onSearchKeyChangeHandler = (searchKey: string) => {

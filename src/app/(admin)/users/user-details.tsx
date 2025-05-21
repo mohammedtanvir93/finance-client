@@ -13,7 +13,7 @@ export interface IUserDetails {
     updatedAt: Date;
 }
 
-interface IProps {
+interface Props {
     user: IUserDetails;
     onCloseModal: () => void;
     onEdit: (editableUser: IUser) => void;
@@ -23,7 +23,7 @@ const UserDetails = ({
     onCloseModal,
     onEdit,
     user
-}: IProps) => {
+}: Props) => {
     return (
         <Modal isOpen={true} onClose={onCloseModal} className="max-w-[700px] m-4">
             <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">

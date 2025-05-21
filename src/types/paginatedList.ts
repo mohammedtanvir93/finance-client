@@ -1,4 +1,4 @@
-interface IPaginatedList {
+interface PaginatedList {
     skip: number;
     limit: number;
     filter: {
@@ -10,4 +10,4 @@ interface IPaginatedList {
     }
 }
 
-export default IPaginatedList;
+export default PaginatedList;

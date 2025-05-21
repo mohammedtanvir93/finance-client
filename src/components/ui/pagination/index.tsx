@@ -2,7 +2,7 @@ import Select, { Option } from '@/components/form/Select';
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
-interface IProps {
+interface Props {
     itemsPerPage?: number[];
     totalItems: number;
     page: number;
@@ -14,7 +14,7 @@ const Pagination = ({
     totalItems,
     onPageOrPageItemChange,
     page = 1
-}: IProps) => {
+}: Props) => {
     const [perPageItems, setPerPageItems] = useState<number | null>(null);
 
     const selectOptions: Option[] = useMemo(() => {

@@ -19,7 +19,7 @@ export interface IUser {
     status: string;
 }
 
-interface IProps {
+interface Props {
     user?: IUser | null;
     onCloseModal: () => void;
 }
@@ -48,7 +48,7 @@ type FormFields = z.infer<typeof schema>;
 const UserForm = ({
     onCloseModal,
     user
-}: IProps) => {
+}: Props) => {
     const create = useMemo(() => user === null, [user]);
 
     const {
