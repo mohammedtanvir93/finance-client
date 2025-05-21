@@ -18,6 +18,20 @@ export interface UserDetails extends UserBase {
     role: RoleDetails;
 }
 
+export type UserCreate = {
+    email: string;
+    fullname: string;
+    role_id: string;
+};
+
+export interface UserUpdate extends UserCreate {
+    status: string;
+};
+
+export type UserForm =
+    | UserCreate
+    | UserUpdate;
+
 export interface PaginatedUserResponse {
     data: User[];
     total: number;

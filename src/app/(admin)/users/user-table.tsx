@@ -12,17 +12,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useUser } from '@/hooks/query/user/useUser';
 import { useUsers } from '@/hooks/query/user/useUsers';
 import usePagination from "@/hooks/usePagination";
-import { User } from "@/types/user";
+import getStatusBadge from "@/utils/user-status-badge";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import UserDetails from "./user-details";
-import { useUser } from '@/hooks/query/user/useUser';
-import getStatusBadge from "@/utils/user-status-badge";
-
-type UserStatus = User['status'];
+import UserForm from "./user-form";
 
 const UserTable = () => {
     const toastId = useRef<string | number | null>(null);
@@ -37,10 +35,9 @@ const UserTable = () => {
         page, setPage,
         itemsPerPage, setItemsPerPage,
         sortBy, setSortBy,
-        sortOrder, setSortOrder, toggleSortOrder
+        sortOrder, toggleSortOrder
     } = usePagination('created_at', 'asc');
-
-    const { data: paginatedResponse, isLoading, error } = useUsers({
+    const paginatedListParams = useMemo(() => ({
         skip: (page - 1) * itemsPerPage,
         limit: itemsPerPage,
         filter: {
@@ -49,8 +46,10 @@ const UserTable = () => {
                 sortBy: sortBy,
                 sortOrder: sortOrder,
             },
-        },
-    });
+        }
+    }), [page, itemsPerPage, searchKey, sortBy, sortOrder]);
+
+    const { data: paginatedResponse, isLoading, error } = useUsers(paginatedListParams);
 
     const {
         data: userDetails,
@@ -95,8 +94,23 @@ const UserTable = () => {
     }, [isUserDetailsLoading, userDetailsError]);
 
     useEffect(() => {
+        if (isUserLoading && toastId.current === null) {
+            toastId.current = toast.loading('Loading user...');
+        }
+
+        if (!isUserLoading && toastId.current) {
+            toast.dismiss(toastId.current);
+            toastId.current = null;
+
+            if (userError) {
+                toast.error('Failed to load user');
+            }
+        }
+    }, [isUserLoading, userError]);
+
+    useEffect(() => {
         setPage(1);
-    }, [searchKey]);
+    }, [searchKey, setPage]);
 
     const handleEdit = (editableUserId: string) => {
         setUserDetailsId('');
@@ -109,10 +123,10 @@ const UserTable = () => {
         setRemovableUser(null);
     };
 
-    // const handleCloseForm = () => {
-    //     setUser(null);
-    //     setOpenUserForm(false);
-    // };
+    const handleCloseForm = () => {
+        setUserId('');
+        setOpenUserForm(false);
+    };
 
     const handlePageOrPageItemChange = (page: number, itemsPerPage: number) => {
         setPage(page);
@@ -140,9 +154,9 @@ const UserTable = () => {
                     onCloseModal={() => setUserDetailsId('')}
                 />
             }
-            {/* {
-                openUserForm && <UserForm user={user} onCloseModal={handleCloseForm} />
-            } */}
+            {
+                openUserForm && <UserForm paginatedListParams={paginatedListParams} user={user} onCloseModal={handleCloseForm} />
+            }
             <div className="flex items-center justify-between mb-5">
                 <SearchInput
                     className="w-[500px]"
@@ -279,12 +293,12 @@ const UserTable = () => {
                                         {actionRow === user.id && (
                                             <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-26 dark:bg-gray-700">
                                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                                    {/* <li onClick={() => handleEdit(user)}>
+                                                    <li onClick={() => handleEdit(user.id)}>
                                                         <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                             <Pencil className="w-4 h-4" />
                                                             Edit
                                                         </a>
-                                                    </li> */}
+                                                    </li>
                                                     <li>
                                                         <a
                                                             onClick={() => setUserDetailsId(user.id)}

@@ -64,34 +64,31 @@ const http = {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     post: async <T = any>(url: string, data?: any, options: RequestInit = {}): Promise<T> => {
-        const res = await customFetch(url, {
+        return customFetch(url, {
             ...options,
             method: 'POST',
             body: data ? JSON.stringify(data) : undefined,
             headers: { ...defaultHeaders, ...options.headers },
         });
-        return res.json();
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     patch: async <T = any>(url: string, data?: any, options: RequestInit = {}): Promise<T> => {
-        const res = await customFetch(url, {
+        return customFetch(url, {
             ...options,
             method: 'PATCH',
             body: data ? JSON.stringify(data) : undefined,
             headers: { ...defaultHeaders, ...options.headers },
         });
-        return res.json();
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete: async <T = any>(url: string, options: RequestInit = {}): Promise<T> => {
-        const res = await customFetch(url, {
+        return customFetch(url, {
             ...options,
             method: 'DELETE',
             headers: { ...defaultHeaders, ...options.headers },
         });
-        return res.json();
     },
 };
 
