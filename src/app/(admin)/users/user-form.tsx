@@ -18,6 +18,16 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
+const apiToFormFields = {
+    fullname: 'name',
+    email: 'email',
+    status: 'status',
+    role_id: 'role'
+} as const;
+
+type ErrorFieldType = typeof apiToFormFields[keyof typeof apiToFormFields];
+type ErrorApiFieldType = keyof typeof apiToFormFields;
+
 interface Props {
     user?: UserDetails | null;
     paginatedListParams: PaginatedList;
@@ -78,8 +88,9 @@ const UserForm = ({
         control,
         formState: {
             isSubmitting,
-            errors
-        }
+            errors,
+        },
+        setError
     } = useForm<FormFields>({
         resolver: zodResolver(schema)
     });
@@ -127,7 +138,12 @@ const UserForm = ({
                 onCloseModal();
             },
             onError: (error) => {
-                console.error('Failed to create user:', error);
+                const errorDetails = error.message ? JSON.parse(error.message) : null;
+
+                if (errorDetails?.detail?.errors)
+                    showServerErrors(errorDetails.detail.errors);
+                else if (errorDetails?.errors)
+                    showServerErrors(errorDetails.errors);
             },
             onSettled: () => {
                 if (toastId.current) {
@@ -136,6 +152,19 @@ const UserForm = ({
                 }
             }
         });
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const showServerErrors = (errors: any) => {
+
+        for (const field in (errors as string[])) {
+            setError(
+                apiToFormFields[field as ErrorApiFieldType],
+                {
+                    type: 'manual', message: errors[field]
+                }
+            );
+        }
     };
 
     const updateExistingUser = (id: string, data: FormFields) => {
@@ -150,6 +179,14 @@ const UserForm = ({
             onSuccess: () => {
                 toast.success('User information updated successfully');
                 onCloseModal();
+            },
+            onError: (error) => {
+                const errorDetails = error.message ? JSON.parse(error.message) : null;
+
+                if (errorDetails?.detail?.errors)
+                    showServerErrors(errorDetails.detail.errors);
+                else if (errorDetails?.errors)
+                    showServerErrors(errorDetails.errors);
             },
             onSettled: () => {
                 if (toastId.current) {

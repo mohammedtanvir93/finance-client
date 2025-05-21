@@ -49,11 +49,14 @@ const Pagination = ({
                     placeholder="Select"
                     onChange={(value) => handlePerPageItemsChange(parseInt(value))}
                     className="dark:bg-dark-900"
-                    defaultValue={itemsPerPage[0].toString()}
+                    value={itemsPerPage[0].toString()}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none dark:text-gray-400">
                     <ChevronDown width={12} />
                 </span>
+            </div>
+            <div>
+                <span className="text-xs font-semibold text-gray-800 dark:text-white/90">Total : {totalItems}</span>
             </div>
             <div className="flex items-center space-x-2">
                 <button onClick={() => onPageChange(1)} disabled={(page) <= 1} className="p-1.5 border rounded hover:bg-gray-100 dark:hover:bg-gray-800">

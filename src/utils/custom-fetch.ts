@@ -20,7 +20,16 @@ async function customFetch<T = any>(
 
         if (!response.ok) {
             const errorBody = await response.text();
-            throw new Error(`HTTP error! Status: ${response.status} - ${errorBody}`);
+            let errorDetails: string | object = errorBody;
+
+            try {
+                errorDetails = JSON.parse(errorBody);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (err) {
+                errorDetails = { message: errorBody };
+            }
+
+            throw new Error(`${JSON.stringify(errorDetails)}`);
         }
 
         return response.json() as Promise<T>;

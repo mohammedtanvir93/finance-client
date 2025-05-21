@@ -18,9 +18,6 @@ export const useUpdateUser = (id: string | undefined, paginatedListParams: Pagin
         onSuccess: () => {
             const userListKey = userKeys.paginatedList(paginatedListParams);
             queryClient.invalidateQueries({ queryKey: userListKey });
-        },
-        onError: (error) => {
-            console.error('Failed to update the user:', error);
-        },
+        }
     });
 };
