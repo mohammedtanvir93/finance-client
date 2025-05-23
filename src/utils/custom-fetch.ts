@@ -14,7 +14,7 @@ async function customFetch<T = any>(
 
         if (response.status === 401) {
             cancelAllRequests();
-            window.location.href = '/login';
+            window.location.href = '/signin';
             throw new Error('Unauthorized - Redirecting to login');
         }
 
