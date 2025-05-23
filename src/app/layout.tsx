@@ -1,7 +1,6 @@
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { Outfit } from 'next/font/google';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './globals.css';
 
@@ -21,10 +20,6 @@ export default function RootLayout({
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
         </ThemeProvider>
-        <ToastContainer
-          position='bottom-right'
-          style={{ zIndex: 99999 }}
-        />
       </body>
     </html>
   );
