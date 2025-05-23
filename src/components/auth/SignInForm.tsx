@@ -85,7 +85,7 @@ export default function SignInForm() {
       },
       onSettled: () => {
         if (toastId.current) {
-          toast.dismiss(toastId.current);
+          toast.dismiss(toastId.current as string);
           toastId.current = null;
         }
       }

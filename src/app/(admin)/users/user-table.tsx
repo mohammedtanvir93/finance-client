@@ -80,7 +80,7 @@ const UserTable = () => {
         }
 
         if (!isRemovableUserLoading && toastId.current) {
-            toast.dismiss(toastId.current);
+            toast.dismiss(toastId.current as string);
             toastId.current = null;
 
             if (removableUserError) {
@@ -95,7 +95,7 @@ const UserTable = () => {
         }
 
         if (!isLoading && toastId.current) {
-            toast.dismiss(toastId.current);
+            toast.dismiss(toastId.current as string);
             toastId.current = null;
 
             if (error) {
@@ -110,7 +110,7 @@ const UserTable = () => {
         }
 
         if (!isUserDetailsLoading && toastId.current) {
-            toast.dismiss(toastId.current);
+            toast.dismiss(toastId.current as string);
             toastId.current = null;
 
             if (userDetailsError) {
@@ -125,7 +125,7 @@ const UserTable = () => {
         }
 
         if (!isUserLoading && toastId.current) {
-            toast.dismiss(toastId.current);
+            toast.dismiss(toastId.current as string);
             toastId.current = null;
 
             if (userError) {
@@ -159,7 +159,7 @@ const UserTable = () => {
             },
             onSettled: () => {
                 if (toastId.current) {
-                    toast.dismiss(toastId.current);
+                    toast.dismiss(toastId.current as string);
                     toastId.current = null;
                 }
             }
@@ -334,8 +334,7 @@ const UserTable = () => {
                                 <TableCell className="py-4 sm:px-2 text-start">
                                     <div
                                         className="relative inline-block"
-                                        onMouseEnter={() => setActionRow(user.id)}
-                                        onMouseLeave={() => setActionRow('')}
+                                        onClick={() => actionRow !== user.id ? setActionRow(user.id) : setActionRow('')}
                                     >
                                         <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-2.5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                             Action
