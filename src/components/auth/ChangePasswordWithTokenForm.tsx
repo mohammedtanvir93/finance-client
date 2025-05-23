@@ -5,13 +5,13 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import ErrorMsg from "../form/error-msg";
 import { useAddPassword } from "@/hooks/mutation/auth/useAddPassword";
 import { toast } from "react-toastify";
-import { store } from "@/utils/session";
+import { retrieve, store } from "@/utils/session";
 import Alert from "../ui/alert/Alert";
 import { useRouter } from 'next/navigation';
 
@@ -70,6 +70,13 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showRetypePassword, setShowRetypePassword] = useState(false);
+
+    useEffect(() => {
+        const token = retrieve("token");
+        if (token) {
+            router.replace("/users");
+        }
+    }, [router]);
 
     const onSubmit: SubmitHandler<FormFields> = (data) => {
         clearErrors();

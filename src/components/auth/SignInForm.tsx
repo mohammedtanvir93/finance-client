@@ -5,14 +5,14 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import ErrorMsg from "../form/error-msg";
 import { useLogin } from "@/hooks/mutation/auth/useLogin";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { store } from "@/utils/session";
+import { retrieve, store } from "@/utils/session";
 import Alert from "../ui/alert/Alert";
 
 const schema = z
@@ -51,6 +51,13 @@ export default function SignInForm() {
   } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const token = retrieve("token");
+    if (token) {
+      router.replace("/users");
+    }
+  }, [router]);
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     clearErrors();
