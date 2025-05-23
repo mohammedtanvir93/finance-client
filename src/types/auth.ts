@@ -6,3 +6,8 @@ export interface ChangePasswordWithToken {
 export interface BearerToken {
     access_token: string;
 }
+
+export interface Login {
+    username: string;
+    password: string;
+}

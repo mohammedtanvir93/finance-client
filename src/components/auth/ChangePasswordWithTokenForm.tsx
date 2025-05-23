@@ -78,7 +78,7 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
         addPassword(data, {
             onSuccess: (result) => {
                 store('token', result.access_token);
-                toast.success('A new user created successfully');
+                toast.success('New password adding....');
                 router.push('/users');
             },
             onError: (error) => {

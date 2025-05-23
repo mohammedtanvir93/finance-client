@@ -1,3 +1,4 @@
+import { object } from "zod";
 import { retrieve } from "./session";
 
 const controllers = new Set<AbortController>();
@@ -21,7 +22,7 @@ async function customFetch<T = any>(
     try {
         const response = await fetch(input, init);
 
-        if (response.status === 401) {
+        if (response.status === 401 && window.location.pathname !== '/signin') {
             cancelAllRequests();
             window.location.href = '/signin';
             throw new Error('Unauthorized - Redirecting to login');
@@ -93,13 +94,17 @@ const http = {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     post: async <T = any>(url: string, data?: any, options: RequestInit = {}): Promise<T> => {
+        const isObject =
+            data !== null && typeof data === 'object' && !(data instanceof FormData);
+
         return customFetch(url, {
             ...options,
             method: 'POST',
-            body: data ? JSON.stringify(data) : undefined,
+            body: isObject ? JSON.stringify(data) : data,
             headers: { ...defaultHeaders, ...options.headers },
         });
     },
+
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     patch: async <T = any>(url: string, data?: any, options: RequestInit = {}): Promise<T> => {
