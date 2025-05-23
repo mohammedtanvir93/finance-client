@@ -11,7 +11,7 @@ import { z } from "zod";
 import ErrorMsg from "../form/error-msg";
 import { useLogin } from "@/hooks/mutation/auth/useLogin";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { retrieve, store } from "@/utils/session";
 import Alert from "../ui/alert/Alert";
 

@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
 
 type Theme = "light" | "dark";
 
@@ -48,9 +48,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastContainer
+      <Toaster
         position='bottom-right'
-        style={{ zIndex: 99999 }}
+        toastOptions={{
+          style: {
+            zIndex: 99999
+          }
+        }}
       />
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
         {children}

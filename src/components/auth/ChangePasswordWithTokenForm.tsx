@@ -10,7 +10,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import ErrorMsg from "../form/error-msg";
 import { useAddPassword } from "@/hooks/mutation/auth/useAddPassword";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { retrieve, store } from "@/utils/session";
 import Alert from "../ui/alert/Alert";
 import { useRouter } from 'next/navigation';
@@ -47,6 +47,7 @@ type FormFields = z.infer<typeof schema>;
 type ErrorApiFieldType = keyof FormFields;
 
 export default function ChangePasswordWithTokenForm({ token }: Props) {
+    console.log('toast', toast);
     const router = useRouter();
 
     const toastId = useRef<string | number | null>(null);
@@ -91,29 +92,16 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
             onError: (error) => {
                 const errorDetails = error.message ? JSON.parse(error.message) : null;
 
-                if (errorDetails?.detail?.errors || errorDetails?.errors) {
-                    const errors = errorDetails?.detail?.errors || errorDetails?.errors;
-
-                    for (const field in (errors as string[])) {
-                        setError(
-                            field as ErrorApiFieldType,
-                            {
-                                type: 'manual', message: errors[field]
-                            }
-                        );
-                    }
-                } else {
-                    if (errorDetails.detail) {
-                        setError(
-                            'root',
-                            {
-                                type: 'manual', message: errorDetails.detail
-                            }
-                        );
-                    }
-
-                    console.error('Failed to add new password');
+                if (errorDetails.detail) {
+                    setError(
+                        'root',
+                        {
+                            type: 'manual', message: errorDetails.detail
+                        }
+                    );
                 }
+
+                console.error('Failed to add new password');
             },
             onSettled: () => {
                 if (toastId.current) {

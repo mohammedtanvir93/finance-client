@@ -18,7 +18,7 @@ import usePagination from "@/hooks/usePagination";
 import getStatusBadge from "@/utils/user-status-badge";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import UserDetails from "./user-details";
 import UserForm from "./user-form";
 import { useDeleteUser } from "@/hooks/mutation/user/useDeleteUser";

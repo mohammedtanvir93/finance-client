@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon, Save, X } from 'lucide-react';
 import { useEffect, useMemo, useRef } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import { z } from "zod";
 
 const apiToFormFields = {
