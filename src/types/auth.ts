@@ -1,4 +1,8 @@
 export interface ChangePasswordWithToken {
-    newPassword: string;
-    retypeNewPassword: string;
+    new_password: string;
+    retype_new_password: string;
+}
+
+export interface BearerToken {
+    access_token: string;
 }

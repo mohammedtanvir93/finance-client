@@ -4,15 +4,118 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
-import React, { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useRef, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import ErrorMsg from "../form/error-msg";
+import { useAddPassword } from "@/hooks/mutation/auth/useAddPassword";
+import { toast } from "react-toastify";
+import { store } from "@/utils/session";
+import Alert from "../ui/alert/Alert";
+import { useRouter } from 'next/navigation';
 
 interface Props {
     token: string;
 }
 
+const passwordRules =
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()[\]{}\-_=+\\|;:'",.<>/?]).{8,}$/;
+
+const schema = z
+    .object({
+        new_password: z
+            .string()
+            .min(8, { message: 'Password must be at least 8 characters' })
+            .max(50, { message: 'Password must be under 50 characters' })
+            .regex(passwordRules, {
+                message:
+                    'Password must contain at least 1 uppercase letter, 1 number, and 1 special character',
+            }),
+        retype_new_password: z
+            .string()
+            .min(8, { message: 'Password must be at least 8 characters' })
+            .max(50, { message: 'Password must be under 50 characters' }),
+    })
+    .refine((data) => data.new_password === data.retype_new_password, {
+        path: ['retype_new_password'],
+        message: 'Passwords do not match',
+    });
+
+type FormFields = z.infer<typeof schema>;
+
+type ErrorApiFieldType = keyof FormFields;
+
 export default function ChangePasswordWithTokenForm({ token }: Props) {
+    const router = useRouter();
+
+    const toastId = useRef<string | number | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        formState: {
+            isSubmitting,
+            errors,
+        },
+        setError,
+        clearErrors
+    } = useForm<FormFields>({
+        resolver: zodResolver(schema)
+    });
+
+    const {
+        mutate: addPassword
+    } = useAddPassword(token);
+
     const [showPassword, setShowPassword] = useState(false);
     const [showRetypePassword, setShowRetypePassword] = useState(false);
+
+    const onSubmit: SubmitHandler<FormFields> = (data) => {
+        clearErrors();
+        toastId.current = toast.loading('Adding new password...');
+
+        addPassword(data, {
+            onSuccess: (result) => {
+                store('token', result.access_token);
+                toast.success('A new user created successfully');
+                router.push('/users');
+            },
+            onError: (error) => {
+                const errorDetails = error.message ? JSON.parse(error.message) : null;
+
+                if (errorDetails?.detail?.errors || errorDetails?.errors) {
+                    const errors = errorDetails?.detail?.errors || errorDetails?.errors;
+
+                    for (const field in (errors as string[])) {
+                        setError(
+                            field as ErrorApiFieldType,
+                            {
+                                type: 'manual', message: errors[field]
+                            }
+                        );
+                    }
+                } else {
+                    if (errorDetails.detail) {
+                        setError(
+                            'root',
+                            {
+                                type: 'manual', message: errorDetails.detail
+                            }
+                        );
+                    }
+
+                    console.error('Failed to add new password');
+                }
+            },
+            onSettled: () => {
+                if (toastId.current) {
+                    toast.dismiss(toastId.current);
+                    toastId.current = null;
+                }
+            }
+        });
+    };
 
     return (
         <div className="flex flex-col flex-1 lg:w-1/2 w-full">
@@ -27,7 +130,7 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
                         </p>
                     </div>
                     <div>
-                        <form>
+                        <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="space-y-6">
                                 <div>
                                     <Label>
@@ -37,6 +140,8 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
                                         <Input
                                             type={showPassword ? "text" : "password"}
                                             placeholder="Enter your password"
+                                            error={errors.new_password !== undefined}
+                                            {...register('new_password')}
                                         />
                                         <span
                                             onClick={() => setShowPassword(!showPassword)}
@@ -49,6 +154,7 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
                                             )}
                                         </span>
                                     </div>
+                                    <ErrorMsg message={errors.new_password?.message} />
                                 </div>
                                 <div>
                                     <Label>
@@ -58,6 +164,8 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
                                         <Input
                                             type={showRetypePassword ? "text" : "password"}
                                             placeholder="Re-enter your new password"
+                                            error={errors.retype_new_password !== undefined}
+                                            {...register('retype_new_password')}
                                         />
                                         <span
                                             onClick={() => setShowRetypePassword(!showRetypePassword)}
@@ -70,12 +178,17 @@ export default function ChangePasswordWithTokenForm({ token }: Props) {
                                             )}
                                         </span>
                                     </div>
+                                    <ErrorMsg message={errors.retype_new_password?.message} />
                                 </div>
                                 <div>
-                                    <Button className="w-full" size="sm">
+                                    <Button disabled={isSubmitting} type="submit" className="w-full" size="sm">
                                         Submit
                                     </Button>
                                 </div>
+                                {
+                                    errors.root &&
+                                    <Alert variant="error" title="Warning" message={errors.root.message as string} />
+                                }
                             </div>
                         </form>
                     </div>

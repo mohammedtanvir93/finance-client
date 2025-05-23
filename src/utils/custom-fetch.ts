@@ -1,3 +1,5 @@
+import { retrieve } from "./session";
+
 const controllers = new Set<AbortController>();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,6 +10,13 @@ async function customFetch<T = any>(
     const controller = new AbortController();
     init.signal = controller.signal;
     controllers.add(controller);
+
+    const token = retrieve('token');
+
+    init.headers = {
+        ...init.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
 
     try {
         const response = await fetch(input, init);
