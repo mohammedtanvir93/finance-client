@@ -50,23 +50,23 @@ const UserTable = () => {
         }
     }), [page, itemsPerPage, searchKey, sortBy, sortOrder]);
 
-    const { data: paginatedResponse, isLoading, error } = useUsers(paginatedListParams);
+    const { data: paginatedResponse, isFetching, error } = useUsers(paginatedListParams);
 
     const {
         data: userDetails,
-        isLoading: isUserDetailsLoading,
+        isFetching: isUserDetailsLoading,
         error: userDetailsError
     } = useUser(userDetailsId);
 
     const {
         data: user,
-        isLoading: isUserLoading,
+        isFetching: isUserLoading,
         error: userError
     } = useUser(userId);
 
     const {
         data: removableUser,
-        isLoading: isRemovableUserLoading,
+        isFetching: isRemovableUserLoading,
         error: removableUserError
     } = useUser(removableUserId);
 
@@ -75,7 +75,7 @@ const UserTable = () => {
     } = useDeleteUser(paginatedListParams);
 
     useEffect(() => {
-        if (isRemovableUserLoading && toastId.current === null) {
+        if (isRemovableUserLoading) {
             toastId.current = toast.loading('Loading user...');
         }
 
@@ -90,11 +90,11 @@ const UserTable = () => {
     }, [isRemovableUserLoading, removableUserError]);
 
     useEffect(() => {
-        if (isLoading && toastId.current === null) {
+        if (isFetching) {
             toastId.current = toast.loading('Loading users...');
         }
 
-        if (!isLoading && toastId.current) {
+        if (!isFetching && toastId.current) {
             toast.dismiss(toastId.current as string);
             toastId.current = null;
 
@@ -102,10 +102,10 @@ const UserTable = () => {
                 toast.error('Failed to load users');
             }
         }
-    }, [isLoading, error]);
+    }, [isFetching, error]);
 
     useEffect(() => {
-        if (isUserDetailsLoading && toastId.current === null) {
+        if (isUserDetailsLoading) {
             toastId.current = toast.loading('Loading user...');
         }
 
@@ -120,7 +120,7 @@ const UserTable = () => {
     }, [isUserDetailsLoading, userDetailsError]);
 
     useEffect(() => {
-        if (isUserLoading && toastId.current === null) {
+        if (isUserLoading) {
             toastId.current = toast.loading('Loading user...');
         }
 
