@@ -44,10 +44,7 @@ const schema = z
 
 type FormFields = z.infer<typeof schema>;
 
-type ErrorApiFieldType = keyof FormFields;
-
 export default function ChangePasswordWithTokenForm({ token }: Props) {
-    console.log('toast', toast);
     const router = useRouter();
 
     const toastId = useRef<string | number | null>(null);

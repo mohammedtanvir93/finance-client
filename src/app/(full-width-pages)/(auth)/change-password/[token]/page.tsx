@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     description: "Enter and confirm your new password to complete the reset process.",
 };
 
-export default function ChangePasswordWithToken({ params: { token } }: { params: Params }) {
+export default async function ChangePasswordWithToken({ params }: { params: Params }) {
+    const { token } = await params;
+
     return <ChangePasswordWithTokenForm token={token} />;
 }
