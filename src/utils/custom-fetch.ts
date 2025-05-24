@@ -1,5 +1,5 @@
 import { object } from "zod";
-import { retrieve } from "./session";
+import { remove, retrieve } from "./session";
 
 const controllers = new Set<AbortController>();
 
@@ -24,6 +24,7 @@ async function customFetch<T = any>(
 
         if (response.status === 401 && window.location.pathname !== '/signin') {
             cancelAllRequests();
+            remove('token');
             window.location.href = '/signin';
             throw new Error('Unauthorized - Redirecting to login');
         }
