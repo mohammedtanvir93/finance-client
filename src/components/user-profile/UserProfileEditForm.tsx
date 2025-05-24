@@ -8,6 +8,9 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorMsg from "../form/error-msg";
+import { useRef } from "react";
+import { useSelfUpdate } from "@/hooks/mutation/user/useSelfUpdate";
+import toast from "react-hot-toast";
 
 interface Props {
     loggedInUser?: UserDetails;
@@ -30,7 +33,11 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
+type ErrorFieldType = keyof FormFields;
+
 const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
+    const toastId = useRef<string | number | null>(null);
+
     const {
         register,
         handleSubmit,
@@ -43,8 +50,43 @@ const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
         resolver: zodResolver(schema)
     });
 
-    const onSubmit: SubmitHandler<FormFields> = (data) => {
+    const {
+        mutate: selfUpdate
+    } = useSelfUpdate();
 
+    const onSubmit: SubmitHandler<FormFields> = (data) => {
+        toastId.current = toast.loading('Profile updating...');
+
+        selfUpdate(data, {
+            onSuccess: () => {
+                closeModal();
+                toast.success('Profile updated successfully');
+            },
+            onError: (error) => {
+                const errorDetails = error.message ? JSON.parse(error.message) : null;
+
+                if (errorDetails) {
+                    const errors = errorDetails?.detail?.errors || errorDetails?.errors;
+
+                    for (const field in (errors as string[])) {
+                        setError(
+                            field as ErrorFieldType,
+                            {
+                                type: 'manual', message: errors[field]
+                            }
+                        );
+                    }
+                }
+
+                console.error('Failed to update profile');
+            },
+            onSettled: () => {
+                if (toastId.current) {
+                    toast.dismiss(toastId.current as string);
+                    toastId.current = null;
+                }
+            }
+        });
     };
 
     return (

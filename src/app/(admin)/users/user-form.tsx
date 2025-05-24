@@ -25,7 +25,6 @@ const apiToFormFields = {
     role_id: 'role'
 } as const;
 
-type ErrorFieldType = typeof apiToFormFields[keyof typeof apiToFormFields];
 type ErrorApiFieldType = keyof typeof apiToFormFields;
 
 interface Props {

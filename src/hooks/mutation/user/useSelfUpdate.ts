@@ -3,7 +3,7 @@ import { updateMe } from '@/services/userService';
 import { SelfUpdate } from '@/types/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useUpdateUser = () => {
+export const useSelfUpdate = () => {
     const queryClient = useQueryClient();
 
     return useMutation({

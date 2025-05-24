@@ -42,5 +42,5 @@ export const fetchMe = async (): Promise<UserDetails> => {
 };
 
 export const updateMe = async (payload: SelfUpdate): Promise<void> => {
-    await http.post(`${BASE_URL}/users/me`, payload);
+    await http.patch(`${BASE_URL}/users/me`, payload);
 };
