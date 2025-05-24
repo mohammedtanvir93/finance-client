@@ -5,6 +5,7 @@ const userKeys = {
     paginatedList: (params: PaginatedList) =>
         [...userKeys.all, 'paginatedList', { ...params }] as const,
     details: (id: string) => [...userKeys.all, 'details', id] as const,
+    me: () => [...userKeys.all, 'me'] as const
 };
 
 export default userKeys;

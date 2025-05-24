@@ -35,3 +35,8 @@ export const updateUser = async (id: string, payload: UserUpdate): Promise<UserD
 export const deleteUser = async (id: string): Promise<void> => {
     await http.delete(`${BASE_URL}/users/${id}`);
 };
+
+export const fetchMe = async (): Promise<UserDetails> => {
+    const response = await http.get<UserDetails>(`${BASE_URL}/users/me`);
+    return response;
+};

@@ -6,9 +6,12 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
 import { remove } from "@/utils/session";
 import toast from 'react-hot-toast';
+import { useMe } from "@/hooks/query/user/useMe";
 
 export default function UserDropdown() {
   const router = useRouter();
+
+  const { data: loggedInUser } = useMe();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,7 +45,7 @@ export default function UserDropdown() {
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">{loggedInUser?.fullname}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
@@ -70,10 +73,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {loggedInUser?.fullname}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {loggedInUser?.email}
           </span>
         </div>
 
