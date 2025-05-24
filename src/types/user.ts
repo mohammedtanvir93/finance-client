@@ -24,6 +24,11 @@ export type UserCreate = {
     role_id: string;
 };
 
+export type SelfUpdate = {
+    email: string;
+    fullname: string;
+};
+
 export interface UserUpdate extends UserCreate {
     status: string;
 };

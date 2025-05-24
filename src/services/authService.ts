@@ -1,5 +1,5 @@
 import http from '@/utils/custom-fetch';
-import { BearerToken, ChangePasswordWithToken, Login } from '@/types/auth';
+import { BearerToken, ChangePassword, ChangePasswordWithToken, Login } from '@/types/auth';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toUrlEncoded = (obj: Record<string, any>) =>
@@ -21,4 +21,8 @@ export const login = async (payload: Login): Promise<BearerToken> => {
         }
     );
     return response;
+};
+
+export const changeSelfPassword = async (payload: ChangePassword): Promise<void> => {
+    await http.patch(`${BASE_URL}/auth/change-password`, payload);
 };

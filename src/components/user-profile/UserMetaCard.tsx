@@ -46,9 +46,6 @@ export default function UserMetaCard() {
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
-        <UserProfileEditForm loggedInUser={loggedInUser} closeModal={closeModal} />
-      </Modal>
       <Modal isOpen={isChangePasswordOpen} onClose={closeChangePasswordModal} className="max-w-[700px] m-4">
         <ChangePasswordForm closeModal={closeChangePasswordModal} />
       </Modal>

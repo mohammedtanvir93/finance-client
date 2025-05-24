@@ -4,14 +4,48 @@ import { UserDetails } from "@/types/user";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Button from "../ui/button/Button";
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ErrorMsg from "../form/error-msg";
 
 interface Props {
     loggedInUser?: UserDetails;
     closeModal: () => void;
 }
 
+const schema = z.object({
+    email: z
+        .string()
+        .min(1, { message: "Email is required" })
+        .min(3, { message: "Email must be at least 3 characters" })
+        .max(100, { message: "Email must be under 100 characters" })
+        .email("Please enter a valid email address"),
+    fullname: z
+        .string()
+        .min(1, { message: "Name is required" })
+        .min(3, { message: "Name must be at least 3 characters" })
+        .max(255, { message: "Name must be under 255 characters" })
+});
+
+type FormFields = z.infer<typeof schema>;
+
 const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
-    const handleSave = () => { };
+    const {
+        register,
+        handleSubmit,
+        formState: {
+            isSubmitting,
+            errors,
+        },
+        setError
+    } = useForm<FormFields>({
+        resolver: zodResolver(schema)
+    });
+
+    const onSubmit: SubmitHandler<FormFields> = (data) => {
+
+    };
 
     return (
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
@@ -23,7 +57,7 @@ const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
                     Update your details to keep your profile up-to-date.
                 </p>
             </div>
-            <form className="flex flex-col">
+            <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
                 <div className="custom-scrollbar overflow-y-auto px-2 pb-3">
                     <div className="mt-7">
                         <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -33,12 +67,24 @@ const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
                         <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Fullname</Label>
-                                <Input type="text" defaultValue={loggedInUser?.fullname} />
+                                <Input
+                                    type="text"
+                                    defaultValue={loggedInUser?.fullname}
+                                    error={errors.fullname !== undefined}
+                                    {...register('fullname')}
+                                />
+                                <ErrorMsg message={errors.fullname?.message} />
                             </div>
 
                             <div className="col-span-2 lg:col-span-1">
                                 <Label>Email Address</Label>
-                                <Input type="text" defaultValue={loggedInUser?.email} />
+                                <Input
+                                    type="text"
+                                    defaultValue={loggedInUser?.email}
+                                    error={errors.email !== undefined}
+                                    {...register('email')}
+                                />
+                                <ErrorMsg message={errors.email?.message} />
                             </div>
                         </div>
                     </div>
@@ -47,7 +93,7 @@ const UserProfileEditForm = ({ loggedInUser, closeModal }: Props) => {
                     <Button size="sm" variant="outline" onClick={closeModal}>
                         Close
                     </Button>
-                    <Button size="sm" onClick={handleSave}>
+                    <Button size="sm" disabled={isSubmitting} type="submit" >
                         Save Changes
                     </Button>
                 </div>
