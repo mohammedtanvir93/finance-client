@@ -22,7 +22,7 @@ async function customFetch<T = any>(
     try {
         const response = await fetch(input, init);
 
-        if (response.status === 401 && window.location.pathname !== '/signin') {
+        if (response.status === 401) {
             cancelAllRequests();
             remove('token');
             window.location.href = '/signin';

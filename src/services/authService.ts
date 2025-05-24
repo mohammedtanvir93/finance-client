@@ -24,5 +24,5 @@ export const login = async (payload: Login): Promise<BearerToken> => {
 };
 
 export const changeSelfPassword = async (payload: ChangePassword): Promise<void> => {
-    await http.patch(`${BASE_URL}/auth/change-password`, payload);
+    await http.post(`${BASE_URL}/auth/change-password`, payload);
 };

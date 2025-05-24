@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Button from "../ui/button/Button";
@@ -9,6 +9,9 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorMsg from "../form/error-msg";
+import { useChangePassword } from "@/hooks/mutation/auth/useChangePassword";
+import toast from "react-hot-toast";
+import Alert from "../ui/alert/Alert";
 
 interface Props {
     closeModal: () => void;
@@ -35,7 +38,11 @@ const schema = z
 
 type FormFields = z.infer<typeof schema>;
 
+type ErrorFieldType = keyof FormFields;
+
 const ChangePasswordForm = ({ closeModal }: Props) => {
+    const toastId = useRef<string | number | null>(null);
+
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -51,8 +58,39 @@ const ChangePasswordForm = ({ closeModal }: Props) => {
         resolver: zodResolver(schema)
     });
 
-    const onSubmit: SubmitHandler<FormFields> = (data) => {
+    const {
+        mutate: changePassword
+    } = useChangePassword();
 
+    const onSubmit: SubmitHandler<FormFields> = (data) => {
+        toastId.current = toast.loading('Password updating...');
+
+        changePassword(data, {
+            onSuccess: () => {
+                closeModal();
+                toast.success('Password updated successfully');
+            },
+            onError: (error) => {
+                const errorDetails = error.message ? JSON.parse(error.message) : null;
+
+                if (errorDetails.detail) {
+                    setError(
+                        'root',
+                        {
+                            type: 'manual', message: errorDetails.detail
+                        }
+                    );
+                }
+
+                console.error('Failed to update password');
+            },
+            onSettled: () => {
+                if (toastId.current) {
+                    toast.dismiss(toastId.current as string);
+                    toastId.current = null;
+                }
+            }
+        });
     };
 
     return (
@@ -65,7 +103,7 @@ const ChangePasswordForm = ({ closeModal }: Props) => {
                     Update your password regularly to keep your account secure.
                 </p>
             </div>
-            <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+            <form className="flex flex-col mb-3" onSubmit={handleSubmit(onSubmit)}>
                 <div className="custom-scrollbar overflow-y-auto px-2 pb-3">
                     <div className="mt-7">
                         <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -126,10 +164,14 @@ const ChangePasswordForm = ({ closeModal }: Props) => {
                         Close
                     </Button>
                     <Button type="submit" size="sm">
-                        Save Changes
+                        Save Changes - Hello
                     </Button>
                 </div>
             </form>
+            {
+                errors.root &&
+                <Alert variant="error" title="Warning" message={errors.root.message as string} />
+            }
         </div>
     )
 };
