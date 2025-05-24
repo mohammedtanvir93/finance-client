@@ -164,7 +164,7 @@ const ChangePasswordForm = ({ closeModal }: Props) => {
                         Close
                     </Button>
                     <Button type="submit" size="sm">
-                        Save Changes - Hello
+                        Save Changes
                     </Button>
                 </div>
             </form>
