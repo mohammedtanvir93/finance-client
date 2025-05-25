@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 export interface Option {
   value: string;
   label: string;

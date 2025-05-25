@@ -1,4 +1,3 @@
-import { ChangePasswordWithToken } from './auth';
 export interface ChangePasswordWithToken {
     new_password: string;
     retype_new_password: string;

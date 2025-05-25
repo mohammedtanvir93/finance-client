@@ -1,6 +1,6 @@
 import Select, { Option } from '@/components/form/Select';
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 
 interface Props {
     itemsPerPage?: number[];
@@ -27,10 +27,6 @@ const Pagination = ({
     const maxPages = useMemo(() => {
         return perPageItems && totalItems ? Math.ceil(totalItems / perPageItems) : 1;
     }, [perPageItems, totalItems]);
-
-    useEffect(() => {
-        setPerPageItems(itemsPerPage[0]);
-    }, []);
 
     const onPageChange = (currentPage: number) => {
         onPageOrPageItemChange(currentPage, perPageItems as number);

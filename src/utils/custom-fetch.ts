@@ -1,4 +1,3 @@
-import { object } from "zod";
 import { remove, retrieve } from "./session";
 
 const controllers = new Set<AbortController>();

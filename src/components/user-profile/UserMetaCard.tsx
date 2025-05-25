@@ -2,18 +2,13 @@
 import React from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
 import Image from "next/image";
 import { useMe } from "@/hooks/query/user/useMe";
 import { KeyRound } from 'lucide-react';
-import UserProfileEditForm from "./UserProfileEditForm";
 import ChangePasswordForm from "./ChangePasswordForm";
 
 export default function UserMetaCard() {
   const { data: loggedInUser } = useMe();
-  const { isOpen, closeModal } = useModal();
   const { isOpen: isChangePasswordOpen, openModal: openChangePasswordModal, closeModal: closeChangePasswordModal } = useModal();
 
   return (

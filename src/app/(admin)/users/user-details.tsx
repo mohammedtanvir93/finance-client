@@ -1,6 +1,6 @@
 import { Modal } from "@/components/ui/modal";
 import { useMe } from "@/hooks/query/user/useMe";
-import { User, UserDetails as UserInfo } from "@/types/user";
+import { UserDetails as UserInfo } from "@/types/user";
 import { getFormattedDatetime } from "@/utils/date";
 import { check } from "@/utils/permission";
 import getStatusBadge from "@/utils/user-status-badge";

@@ -38,8 +38,6 @@ const schema = z
 
 type FormFields = z.infer<typeof schema>;
 
-type ErrorFieldType = keyof FormFields;
-
 const ChangePasswordForm = ({ closeModal }: Props) => {
     const toastId = useRef<string | number | null>(null);
 

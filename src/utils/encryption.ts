@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY;
+const SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY || 'gJLdeRiB6UQC84a9781FkCyECKWzuMTu';
 
 export function encrypt(data: string) {
     return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
