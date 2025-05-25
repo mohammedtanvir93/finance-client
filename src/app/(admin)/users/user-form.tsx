@@ -9,11 +9,13 @@ import { Modal } from "@/components/ui/modal";
 import { useCreateUser } from "@/hooks/mutation/user/useCreateUser";
 import { useUpdateUser } from "@/hooks/mutation/user/useUpdateUser";
 import { useRoles } from "@/hooks/query/role/useRoles";
+import { useMe } from "@/hooks/query/user/useMe";
 import PaginatedList from "@/types/paginatedList";
 import { UserDetails } from "@/types/user";
+import { check } from "@/utils/permission";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon, Save, X } from 'lucide-react';
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
 import { z } from "zod";
@@ -112,6 +114,28 @@ const UserForm = ({
             label: role.title
         }));
     }, [roles]);
+
+    const { data: loggedInUser } = useMe();
+
+    const canCreateUser = useMemo(() => {
+        return check(
+            loggedInUser, { name: 'create:users' }
+        );
+    }, [loggedInUser]);
+
+    const canEditUser = useCallback((targetId?: string, providedId?: string) => {
+        if (targetId && providedId) {
+            return check(
+                loggedInUser, { name: 'edit:users' }
+            ) || check(
+                loggedInUser, { name: 'editOwn:users', targetId, providedId }
+            );
+        }
+
+        return check(
+            loggedInUser, { name: 'edit:users' }
+        );
+    }, [loggedInUser]);
 
     useEffect(() => {
         if (user) {
@@ -289,9 +313,18 @@ const UserForm = ({
                         <Button size="sm" variant="outline" onClick={onCloseModal} startIcon={<X />}>
                             Close
                         </Button>
-                        <Button type="submit" disabled={isSubmitting} size="sm" startIcon={<Save />}>
-                            {isCreating ? 'Create' : 'Update'}
-                        </Button>
+                        {
+                            isCreating && canCreateUser &&
+                            <Button type="submit" disabled={isSubmitting} size="sm" startIcon={<Save />}>
+                                Create
+                            </Button>
+                        }
+                        {
+                            !isCreating && canEditUser(loggedInUser?.id, user?.id) &&
+                            <Button type="submit" disabled={isSubmitting} size="sm" startIcon={<Save />}>
+                                Update
+                            </Button>
+                        }
                     </div>
                 </form>
             </div>

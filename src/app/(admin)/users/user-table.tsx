@@ -17,11 +17,14 @@ import { useUsers } from '@/hooks/query/user/useUsers';
 import usePagination from "@/hooks/usePagination";
 import getStatusBadge from "@/utils/user-status-badge";
 import { Eye, Pencil, Plus, Trash } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from 'react-hot-toast';
 import UserDetails from "./user-details";
 import UserForm from "./user-form";
 import { useDeleteUser } from "@/hooks/mutation/user/useDeleteUser";
+import { useMe } from "@/hooks/query/user/useMe";
+import { check } from "@/utils/permission";
+import Alert from "@/components/ui/alert/Alert";
 
 const UserTable = () => {
     const toastId = useRef<string | number | null>(null);
@@ -73,6 +76,64 @@ const UserTable = () => {
     const {
         mutate: deleteUser
     } = useDeleteUser(paginatedListParams);
+
+    const { data: loggedInUser } = useMe();
+
+    const canReadUsers = useMemo(() => {
+        return check(
+            loggedInUser, { name: 'view:users' }
+        ) || check(
+            loggedInUser, { name: 'viewOwn:users' }
+        );
+    }, [loggedInUser]);
+
+    const canCreateUser = useMemo(() => {
+        return check(
+            loggedInUser, { name: 'create:users' }
+        );
+    }, [loggedInUser]);
+
+    const canReadUser = useCallback((targetId?: string, providedId?: string) => {
+        if (targetId && providedId) {
+            return check(
+                loggedInUser, { name: 'viewDetails:users' }
+            ) || check(
+                loggedInUser, { name: 'viewOwnDetails:users', targetId, providedId }
+            );
+        }
+
+        return check(
+            loggedInUser, { name: 'viewDetails:users' }
+        );
+    }, [loggedInUser]);
+
+    const canEditUser = useCallback((targetId?: string, providedId?: string) => {
+        if (targetId && providedId) {
+            return check(
+                loggedInUser, { name: 'edit:users' }
+            ) || check(
+                loggedInUser, { name: 'editOwn:users', targetId, providedId }
+            );
+        }
+
+        return check(
+            loggedInUser, { name: 'edit:users' }
+        );
+    }, [loggedInUser]);
+
+    const canDeleteUser = useCallback((targetId?: string, providedId?: string) => {
+        if (targetId && providedId) {
+            return check(
+                loggedInUser, { name: 'delete:users' }
+            ) || check(
+                loggedInUser, { name: 'deleteOwn:users', targetId, providedId }
+            );
+        }
+
+        return check(
+            loggedInUser, { name: 'delete:users' }
+        );
+    }, [loggedInUser]);
 
     useEffect(() => {
         if (isRemovableUserLoading) {
@@ -176,6 +237,15 @@ const UserTable = () => {
         setItemsPerPage(itemsPerPage);
     };
 
+    if (!canReadUsers)
+        return (
+            <Alert
+                variant="warning"
+                title="Access Restricted"
+                message="You don't have permission to view the user list. Please contact your administrator if you need access."
+            />
+        );
+
     return (
         <>
             {
@@ -217,15 +287,17 @@ const UserTable = () => {
                     label="Search Users"
                     onSearchKeyChange={(searchKey) => setSearchKey(searchKey)}
                 />
-
-                <Button
-                    onClick={() => setOpenUserForm(true)}
-                    className="bg-green-600 hover:bg-green-700"
-                    size="sm"
-                    variant="primary"
-                    startIcon={<Plus />}>
-                    Add User
-                </Button>
+                {
+                    canCreateUser &&
+                    <Button
+                        onClick={() => setOpenUserForm(true)}
+                        className="bg-green-600 hover:bg-green-700"
+                        size="sm"
+                        variant="primary"
+                        startIcon={<Plus />}>
+                        Add User
+                    </Button>
+                }
             </div>
 
             <Table>
@@ -346,28 +418,37 @@ const UserTable = () => {
                                         {actionRow === user.id && (
                                             <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-26 dark:bg-gray-700">
                                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                                    <li onClick={() => handleEdit(user.id)}>
-                                                        <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                            <Pencil className="w-4 h-4" />
-                                                            Edit
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a
-                                                            onClick={() => setUserDetailsId(user.id)}
-                                                            href="#"
-                                                            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                        >
-                                                            <Eye className="w-4 h-4" />
-                                                            Details
-                                                        </a>
-                                                    </li>
-                                                    <li onClick={() => setRemovableUserId(user.id)}>
-                                                        <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                            <Trash className="w-4 h-4" />
-                                                            Remove
-                                                        </a>
-                                                    </li>
+                                                    {
+                                                        canEditUser(loggedInUser?.id, user.id) &&
+                                                        <li onClick={() => handleEdit(user.id)}>
+                                                            <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                                <Pencil className="w-4 h-4" />
+                                                                Edit
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    {
+                                                        canReadUser(loggedInUser?.id, user.id) &&
+                                                        <li>
+                                                            <a
+                                                                onClick={() => setUserDetailsId(user.id)}
+                                                                href="#"
+                                                                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                                Details
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    {
+                                                        canDeleteUser(loggedInUser?.id, user.id) &&
+                                                        <li onClick={() => setRemovableUserId(user.id)}>
+                                                            <a href="#" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                                <Trash className="w-4 h-4" />
+                                                                Remove
+                                                            </a>
+                                                        </li>
+                                                    }
                                                 </ul>
                                             </div>
                                         )}

@@ -7,6 +7,10 @@ export const useMe = () => {
     return useQuery<UserDetails>({
         queryKey: userKeys.me(),
         queryFn: () => fetchMe(),
-        staleTime: 1 * 60000
+        staleTime: 60 * 1000,
+        refetchInterval: 60 * 1000,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchOnReconnect: true
     });
 };
