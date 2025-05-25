@@ -1,14 +1,17 @@
 "use client";
+import { useMe } from "@/hooks/query/user/useMe";
+import { remove } from "@/utils/session";
+import { useQueryClient } from '@tanstack/react-query';
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import toast from 'react-hot-toast';
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { useRouter } from "next/navigation";
-import { remove } from "@/utils/session";
-import toast from 'react-hot-toast';
-import { useMe } from "@/hooks/query/user/useMe";
+import userKeys from "@/query-key-factory/user";
 
 export default function UserDropdown() {
+  const queryClient = useQueryClient();
   const router = useRouter();
 
   const { data: loggedInUser } = useMe();
@@ -25,6 +28,7 @@ export default function UserDropdown() {
   }
 
   const logout = () => {
+    queryClient.removeQueries({ queryKey: userKeys.me() });
     remove('token');
     toast.success('Logout successfully');
     router.push('/signin');

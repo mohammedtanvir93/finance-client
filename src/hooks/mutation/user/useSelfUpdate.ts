@@ -9,8 +9,7 @@ export const useSelfUpdate = () => {
     return useMutation({
         mutationFn: (payload: SelfUpdate) => updateMe(payload),
         onSuccess: () => {
-            const userListKey = userKeys.me();
-            queryClient.invalidateQueries({ queryKey: userListKey });
+            queryClient.invalidateQueries({ queryKey: userKeys.me() });
         }
     });
 };
